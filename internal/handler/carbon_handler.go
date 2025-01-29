@@ -24,7 +24,7 @@ func NewCarbonHandler(s service.CarbonService) *CarbonHandler {
 // @Param request body domain.CarbonRequest true "Request Body"
 // @Success 200 {object} domain.CarbonResponse
 // @Failure 400 {object} domain.ErrorResponse
-// @Router /carbon/footprint/calculate [post]
+// @Router /api/carbon/footprint/calculate [post]
 func (h *CarbonHandler) CalculateEmissionBasic(c *fiber.Ctx) error {
 	var req domain.CarbonRequest
 	if err := c.BodyParser(&req); err != nil {
@@ -51,7 +51,7 @@ func (h *CarbonHandler) CalculateEmissionBasic(c *fiber.Ctx) error {
 // @Param request body domain.CarbonRequestWithWeight true "Request Body"
 // @Success 200 {object} domain.CarbonResponseWithWeight
 // @Failure 400 {object} domain.ErrorResponse
-// @Router /carbon/footprint/calculate/weight [post]
+// @Router /api/carbon/footprint/calculate/weight [post]
 func (h *CarbonHandler) CalculateEmissionWithWeight(c *fiber.Ctx) error {
 	var req domain.CarbonRequestWithWeight
 	if err := c.BodyParser(&req); err != nil {

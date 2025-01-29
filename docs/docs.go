@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/carbon/footprint/calculate": {
+        "/api/carbon/footprint/calculate": {
             "post": {
                 "description": "รับค่ากิจกรรมและระยะทาง แล้วคืนค่า Carbon Footprint",
                 "consumes": [
@@ -55,7 +55,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/carbon/footprint/calculate/weight": {
+        "/api/carbon/footprint/calculate/weight": {
             "post": {
                 "description": "รับค่ากิจกรรม, ระยะทาง และน้ำหนัก แล้วคืนค่า Carbon Footprint",
                 "consumes": [

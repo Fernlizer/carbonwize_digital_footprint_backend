@@ -14,30 +14,37 @@ import (
 	"github.com/Fernlizer/carbonwize_digital_footprint_backend/internal/service"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/swagger"
+
+	// Import docs เพื่อให้ Swagger UI ทำงาน
+	_ "github.com/Fernlizer/carbonwize_digital_footprint_backend/docs"
 )
 
 func main() {
-	// ✅ โหลด Config
+	// โหลด Config
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
 
-	// ✅ เชื่อมต่อ Database
+	// เชื่อมต่อ Database
 	db := config.InitDB(cfg)
 
-	// ✅ สร้าง Repository, Service และ Handler
+	// สร้าง Repository, Service และ Handler
 	carbonRepo := repository.NewEmissionRepository(db)
 	carbonService := service.NewCarbonService(carbonRepo)
 	carbonHandler := handler.NewCarbonHandler(carbonService)
 
-	// ✅ สร้าง Fiber App
+	// สร้าง Fiber App
 	app := fiber.New()
 
-	// ✅ ตั้งค่า Routes
+	// ตั้งค่า Swagger UI
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	// ตั้งค่า Routes
 	routes.SetupRoutes(app, carbonHandler)
 
-	// ✅ Graceful Shutdown
+	// Graceful Shutdown
 	go func() {
 		if err := app.Listen(fmt.Sprintf(":%s", cfg.AppPort)); err != nil {
 			log.Fatal("Server failed:", err)

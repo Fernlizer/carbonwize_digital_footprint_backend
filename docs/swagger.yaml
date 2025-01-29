@@ -62,7 +62,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /carbon/footprint/calculate:
+  /api/carbon/footprint/calculate:
     post:
       consumes:
       - application/json
@@ -88,7 +88,7 @@ paths:
       summary: คำนวณ Carbon Footprint
       tags:
       - Carbon
-  /carbon/footprint/calculate/weight:
+  /api/carbon/footprint/calculate/weight:
     post:
       consumes:
       - application/json
