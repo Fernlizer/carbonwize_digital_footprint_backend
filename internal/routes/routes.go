@@ -11,7 +11,7 @@ func SetupRoutes(app *fiber.App, carbonHandler *handler.CarbonHandler) {
 	api := app.Group("/api/carbon/footprint")
 
 	// คำนวณ Carbon Footprint แบบพื้นฐาน
-	api.Post("/calculate", carbonHandler.CalculateEmission)
+	api.Post("/calculate", carbonHandler.CalculateEmissionBasic)
 
 	// คำนวณ Carbon Footprint แบบใช้ `weight`
 	api.Post("/calculate/weight", carbonHandler.CalculateEmissionWithWeight)

@@ -1,6 +1,6 @@
 # CarbonWize Digital Footprint Backend
 
-🚀 **CarbonWize Digital Footprint Backend** เป็นระบบ API ที่ช่วยคำนวณ **Carbon Footprint** จากกิจกรรม เช่น **การขนส่ง (transportation)** โดยใช้ **Golang + Fiber + PostgreSQL** พร้อมรองรับ **Unit Test**
+🚀 **CarbonWize Digital Footprint Backend** เป็นระบบ API ที่ช่วยคำนวณ **Carbon Footprint** จากกิจกรรม เช่น **การขนส่ง (transportation)** โดยใช้ **Golang + Fiber + PostgreSQL** พร้อมรองรับ **Unit Test และ Swagger API Documentation**
 
 ---
 
@@ -64,27 +64,50 @@ go run cmd/main.go
 
 ---
 
-## 🔹 **2. ทดสอบ API ด้วย Postman**
+### ✅ **1.5 ตั้งค่า Swagger API Documentation**
+📌 **ติดตั้ง Swagger CLI**
+```sh
+go install github.com/swaggo/swag/cmd/swag@latest
+```
+📌 **สร้างไฟล์ Swagger Docs**
+```sh
+swag init -g cmd/main.go --output ./docs
+```
+📌 **รันโปรเจกต์ และเปิด Swagger UI**
+```sh
+go run cmd/main.go
+```
+👉 **เปิด Swagger UI ได้ที่:** `http://localhost:8080/swagger/index.html`
+
+---
+
+## 🔹 **2. ทดสอบ API ด้วย Postman หรือ Curl**
 📌 **คำนวณ Carbon Footprint (แบบไม่มีน้ำหนัก)**  
-```json
-POST http://localhost:8080/api/carbon/footprint/calculate/basic
-{
+```sh
+curl -X 'POST' \
+  'http://localhost:8080/api/carbon/footprint/calculate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
   "activity_type": "transportation",
   "distance_km": 100,
   "vehicle_type": "car",
   "fuel_type": "gasoline"
-}
+}'
 ```
 📌 **คำนวณ Carbon Footprint (แบบใช้ `weight` เช่น เครื่องบิน / เรือ)**  
-```json
-POST http://localhost:8080/api/carbon/footprint/calculate/advanced
-{
+```sh
+curl -X 'POST' \
+  'http://localhost:8080/api/carbon/footprint/calculate/weight' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
   "activity_type": "transportation",
   "distance_km": 1000,
   "vehicle_type": "airplane",
   "fuel_type": "jet_fuel",
   "weight": 80000
-}
+}'
 ```
 📌 **ปัญหาที่อาจเกิดขึ้น:**
 - ❌ **error: record not found** → ฐานข้อมูลไม่มีค่าที่ตรงกับ request ให้ตรวจสอบข้อมูลด้วย `SELECT * FROM emission_factors;`
@@ -116,6 +139,7 @@ go test -cover ./test
 |---------|-------------|
 | `go mod tidy` | โหลด Dependency |
 | `migrate up` | รัน Migration (สร้างตาราง) |
+| `swag init -g cmd/main.go --output ./docs` | สร้าง Swagger Docs |
 | `go run cmd/main.go` | รันเซิร์ฟเวอร์ |
 | `air` | รันแบบ Hot Reload |
 | `go test -v ./test` | รันทดสอบ Unit Test |
