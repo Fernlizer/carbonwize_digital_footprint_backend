@@ -21,10 +21,15 @@ jobs:
       - name: 🔧 Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.20
+          go-version: '1.20'  # ✅ ตรวจสอบให้แน่ใจว่าใช้ Go 1.20
+
+      - name: 🏗 Verify Go version
+        run: go version  # ✅ แสดง Go เวอร์ชันที่ใช้อยู่
 
       - name: 📦 Install dependencies
-        run: go mod tidy
+        run: |
+          go env  # ✅ ตรวจสอบ GOPATH และ Environment Variables
+          go mod tidy
 
       - name: ✅ Run Unit Tests
         run: go test -v ./test
