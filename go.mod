@@ -4,7 +4,11 @@ go 1.23.5
 
 require github.com/stretchr/testify v1.10.0
 
-require github.com/swaggo/files/v2 v2.0.2 // indirect
+require (
+	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
+	github.com/swaggo/files/v2 v2.0.2 // indirect
+	github.com/tinylib/msgp v1.2.5 // indirect
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect

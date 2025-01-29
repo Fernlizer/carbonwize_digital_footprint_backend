@@ -1,25 +1,27 @@
 # CarbonWize Digital Footprint Backend
 
-🚀 **CarbonWize Digital Footprint Backend** เป็นระบบ API ที่ช่วยคำนวณ **Carbon Footprint** จากกิจกรรม เช่น **การขนส่ง (transportation)** โดยใช้ **Golang + Fiber + PostgreSQL** พร้อมรองรับ **Unit Test และ Swagger API Documentation**
+**ระบบ Backend สำหรับคำนวณ Carbon Footprint โดยใช้ Golang (Fiber) พร้อม CI/CD และ API Documentation**
+
+## 📌 คุณสมบัติหลัก
+- **CI/CD Pipeline** → รัน Unit Tests อัตโนมัติทุกครั้งที่ push หรือ pull request ไปยัง `main` และ `DEV`
+- **Swagger API Documentation** → รองรับการใช้งานและทดลอง API ผ่าน **Swagger UI**
+- **Unit Testing & Code Coverage** → ทดสอบฟังก์ชันการทำงานของ API ด้วยชุดทดสอบที่ครอบคลุม
+- **Database Migration & Seed Data** → ใช้ **PostgreSQL** พร้อมระบบ **Migration** และค่าเริ่มต้น
+- **Fiber Framework** → รองรับ Middleware, Routing, และ Error Handling
+- **Request ID & Logging** → ใช้ **X-Request-ID** เพื่อติดตาม Request แต่ละรายการ
+- **Health Check API** → รองรับ `/live`, `/ready` ตามมาตรฐาน Kubernetes
 
 ---
 
-## 🔹 **1. Setup Project**
+## 📌 **1. ติดตั้งและตั้งค่าโปรเจกต์**
+
 ### ✅ **1.1 ติดตั้ง Dependency**
-ให้รันคำสั่งนี้เพื่อโหลด package ทั้งหมดที่จำเป็น
 ```sh
 go mod tidy
 ```
 
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **error: go: no module directive in current directory** → ให้รัน `go mod init github.com/yourusername/carbonwize_digital_footprint_backend` ก่อน
-- ❌ **error: unknown import path** → ตรวจสอบว่า `go.mod` มี dependencies ที่ถูกต้องและใช้ `go mod tidy` อัปเดต dependencies
-
----
-
 ### ✅ **1.2 ตั้งค่า Database**
-📌 **ใช้ PostgreSQL และให้สร้าง Database ชื่อ `carbon_db`**  
-📌 **ตั้งค่าไฟล์ `config.yaml`**  
+ใช้ PostgreSQL และสร้าง Database `carbon_db` จากนั้นตั้งค่าไฟล์ `config.yaml`
 ```yaml
 APP_PORT: "8080"
 DB_HOST: "localhost"
@@ -28,61 +30,73 @@ DB_PASSWORD: "yourpassword"
 DB_NAME: "carbon_db"
 DB_PORT: "5432"
 ```
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **error: connection refused** → ตรวจสอบว่า PostgreSQL ทำงานอยู่ (`systemctl status postgresql` หรือ `pg_ctl status`)
-- ❌ **error: password authentication failed** → ตรวจสอบ username/password ใน `config.yaml`
-
----
 
 ### ✅ **1.3 รัน Migration**
-📌 **สร้างตารางและเพิ่มข้อมูลเริ่มต้น**
 ```sh
 migrate -database "postgres://postgres:yourpassword@localhost:5432/carbon_db?sslmode=disable" -path migrations up
 ```
-📌 **เช็คว่าตารางถูกสร้างแล้วหรือไม่**
-```sh
-psql -U postgres -d carbon_db -c "\dt"
-```
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **ERROR: relation "emission_factors" does not exist (SQLSTATE 42P01)** → Migration อาจไม่ถูกรัน ให้ใช้ `migrate up` อีกรอบ
-- ❌ **no change** → ตารางอาจถูกสร้างไปแล้ว ลอง `migrate down` แล้ว `migrate up` ใหม่
-
----
 
 ### ✅ **1.4 รันโปรเจกต์**
-📌 **ใช้ `Air` เพื่อรันแบบ Hot Reload**
 ```sh
-air
+air  # หรือใช้ go run
 ```
-📌 **หรือใช้ `go run`**
 ```sh
 go run cmd/main.go
 ```
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **error: missing table `emission_factors`** → ตรวจสอบว่า migration ถูกรันแล้ว (`migrate up`)
-- ❌ **error: port already in use** → พอร์ตอาจถูกใช้งานอยู่แล้ว ลองเปลี่ยนพอร์ตใน `config.yaml`
 
----
-
-### ✅ **1.5 ตั้งค่า Swagger API Documentation**
-📌 **ติดตั้ง Swagger CLI**
-```sh
-go install github.com/swaggo/swag/cmd/swag@latest
-```
-📌 **สร้างไฟล์ Swagger Docs**
+### ✅ **1.5 สร้างและเรียกใช้ Swagger API Docs**
 ```sh
 swag init -g cmd/main.go --output ./docs
-```
-📌 **รันโปรเจกต์ และเปิด Swagger UI**
-```sh
 go run cmd/main.go
 ```
-👉 **เปิด Swagger UI ได้ที่:** `http://localhost:8080/swagger/index.html`
+เปิด **Swagger UI** ที่: [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
 ---
 
-## 🔹 **2. ทดสอบ API ด้วย Postman หรือ Curl**
-📌 **คำนวณ Carbon Footprint (แบบไม่มีน้ำหนัก)**  
+## 📌 **2. CI/CD Pipeline - Auto Testing**
+ทุกครั้งที่มี **push** หรือ **pull request** ไปยัง `main` หรือ `DEV` ระบบจะ **รัน Unit Tests อัตโนมัติ** บน GitHub Actions
+
+```yaml
+name: CI Pipeline - Auto Testing
+
+on:
+  push:
+    branches:
+      - main
+      - DEV
+  pull_request:
+    branches:
+      - main
+      - DEV
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.23'
+
+      - name: Install dependencies
+        run: |
+          go mod tidy
+
+      - name: Run Unit Tests
+        run: go test -v ./test
+
+      - name: Check test coverage
+        run: go test -cover ./test
+```
+
+---
+
+## 📌 **3. ทดสอบ API ด้วย Postman หรือ Curl**
+### **คำนวณ Carbon Footprint (แบบไม่มีน้ำหนัก)**
 ```sh
 curl -X 'POST' \
   'http://localhost:8080/api/carbon/footprint/calculate' \
@@ -95,7 +109,7 @@ curl -X 'POST' \
   "fuel_type": "gasoline"
 }'
 ```
-📌 **คำนวณ Carbon Footprint (แบบใช้ `weight` เช่น เครื่องบิน / เรือ)**  
+### **คำนวณ Carbon Footprint (แบบมีน้ำหนัก เช่น เครื่องบิน / เรือ)**
 ```sh
 curl -X 'POST' \
   'http://localhost:8080/api/carbon/footprint/calculate/weight' \
@@ -109,40 +123,38 @@ curl -X 'POST' \
   "weight": 80000
 }'
 ```
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **error: record not found** → ฐานข้อมูลไม่มีค่าที่ตรงกับ request ให้ตรวจสอบข้อมูลด้วย `SELECT * FROM emission_factors;`
-- ❌ **error: invalid input** → ตรวจสอบว่า request มีค่าที่ถูกต้อง เช่น `distance_km` ต้องเป็นตัวเลข
 
 ---
 
-## 🔹 **3. รันทดสอบ (Unit Test)**
-📌 **รันทุก Unit Test**
+## 📌 **4. Middleware ที่ใช้งาน**
+| Middleware | รายละเอียด |
+|------------|------------|
+| `AssignRequestID` | เพิ่ม `X-Request-ID` ให้ทุก Request |
+| `RequestLogger` | บันทึก Log ทุก API Request พร้อม Request ID |
+| `CORS` | กำหนด `AllowOrigins` และ Headers ต่างๆ |
+| `RateLimit` | จำกัดจำนวน Requests ต่อช่วงเวลา |
+| `GZIPCompression` | เปิดใช้งาน GZIP เพื่อลดขนาด Response |
+| `Recover` | จัดการ `panic` และคืนค่า Error Response |
+
+---
+
+## 📌 **5. Health Check API**
+รองรับการตรวจสอบสถานะของระบบและ Database ตามมาตรฐาน Kubernetes
 ```sh
-go test -v ./test
+curl -X GET http://localhost:8080/live
+curl -X GET http://localhost:8080/ready
 ```
-📌 **รันเฉพาะไฟล์ `service_test.go`**
-```sh
-go test -v ./test/service_test.go
-```
-📌 **รันทดสอบและเช็ค Coverage**
-```sh
-go test -cover ./test
-```
-📌 **ปัญหาที่อาจเกิดขึ้น:**
-- ❌ **error: no test files** → ตรวจสอบว่าไฟล์ `_test.go` มีอยู่และมีฟังก์ชัน `TestXXX`
-- ❌ **import cycle not allowed** → ตรวจสอบว่า test file ใช้ `package service_test` ไม่ใช่ `package service`
 
 ---
 
 ## 🎯 **สรุป**
-| คำสั่ง | ใช้ทำอะไร |
-|---------|-------------|
-| `go mod tidy` | โหลด Dependency |
-| `migrate up` | รัน Migration (สร้างตาราง) |
-| `swag init -g cmd/main.go --output ./docs` | สร้าง Swagger Docs |
-| `go run cmd/main.go` | รันเซิร์ฟเวอร์ |
-| `air` | รันแบบ Hot Reload |
-| `go test -v ./test` | รันทดสอบ Unit Test |
+| ✅ Feature | 📌 รายละเอียด |
+|-------------|----------------|
+| **CI/CD Pipeline** | ทดสอบโค้ดอัตโนมัติทุกครั้งที่ Push หรือ PR |
+| **Swagger API Docs** | พร้อมให้ใช้งานและทดสอบ API |
+| **Unit Tests & Coverage** | มั่นใจได้ว่าโค้ดทำงานถูกต้อง |
+| **Fiber Framework** | ใช้งานง่ายและรองรับ Middleware |
+| **Health Check API** | รองรับ `/live`, `/ready` ตามมาตรฐาน Kubernetes |
 
-🔥 **ตอนนี้โปรเจกต์พร้อมใช้งานแล้ว! 🚀**
+📌 เปิด **Swagger UI** ที่ 👉 [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
