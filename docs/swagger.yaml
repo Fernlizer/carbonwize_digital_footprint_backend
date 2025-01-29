@@ -1,0 +1,117 @@
+definitions:
+  domain.CarbonRequest:
+    properties:
+      activity_type:
+        example: transportation
+        type: string
+      distance_km:
+        example: 100
+        type: number
+      fuel_type:
+        example: gasoline
+        type: string
+      vehicle_type:
+        example: car
+        type: string
+    type: object
+  domain.CarbonRequestWithWeight:
+    properties:
+      activity_type:
+        example: transportation
+        type: string
+      distance_km:
+        example: 1000
+        type: number
+      fuel_type:
+        example: jet_fuel
+        type: string
+      vehicle_type:
+        example: airplane
+        type: string
+      weight:
+        example: 80000
+        type: number
+    type: object
+  domain.CarbonResponse:
+    properties:
+      activity_type:
+        example: transportation
+        type: string
+      carbon_emission_kg:
+        example: 25.4
+        type: number
+    type: object
+  domain.CarbonResponseWithWeight:
+    properties:
+      activity_type:
+        example: transportation
+        type: string
+      carbon_emission_kg:
+        example: 20000
+        type: number
+      weight_tons:
+        example: 80
+        type: number
+    type: object
+  domain.ErrorResponse:
+    properties:
+      error:
+        example: Invalid input
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /carbon/footprint/calculate:
+    post:
+      consumes:
+      - application/json
+      description: รับค่ากิจกรรมและระยะทาง แล้วคืนค่า Carbon Footprint
+      parameters:
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CarbonRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.CarbonResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: คำนวณ Carbon Footprint
+      tags:
+      - Carbon
+  /carbon/footprint/calculate/weight:
+    post:
+      consumes:
+      - application/json
+      description: รับค่ากิจกรรม, ระยะทาง และน้ำหนัก แล้วคืนค่า Carbon Footprint
+      parameters:
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CarbonRequestWithWeight'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.CarbonResponseWithWeight'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: คำนวณ Carbon Footprint (พาหนะที่มีน้ำหนัก)
+      tags:
+      - Carbon
+swagger: "2.0"
