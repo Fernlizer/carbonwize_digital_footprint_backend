@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Fernlizer/carbonwize_digital_footprint_backend/internal/domain"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -18,11 +19,25 @@ func InitDB(cfg *Config) *gorm.DB {
 		cfg.DatabaseHost, cfg.DatabaseUser, cfg.DatabasePass, cfg.DatabaseName, cfg.DatabasePort,
 	)
 
+	// เชื่อมต่อฐานข้อมูล
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("❌ Failed to connect to database:", err)
 	}
 
+	// ตรวจสอบว่าฐานข้อมูลมีอยู่หรือไม่
+	sqlDB, _ := db.DB()
+	err = sqlDB.Ping()
+	if err != nil {
+		log.Fatal("❌ Database is not available. Please check your database connection.")
+	}
+
+	// ตรวจสอบว่าตาราง `emission_factors` มีอยู่หรือไม่
+	if !db.Migrator().HasTable(&domain.EmissionFactor{}) {
+		log.Fatal("❌ Table 'emission_factors' does not exist. Please run database migration.")
+	}
+
+	// ตั้งค่าให้ใช้งานฐานข้อมูลนี้
 	DB = db
 	fmt.Println("✅ Database connected successfully!")
 	return DB

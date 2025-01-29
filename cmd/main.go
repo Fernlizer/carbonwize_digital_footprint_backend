@@ -20,7 +20,7 @@ func main() {
 		log.Fatal("❌ Failed to load config:", err)
 	}
 
-	// เชื่อมต่อ Database
+	// เชื่อมต่อ Database (ถ้าไม่มีตารางหรือเชื่อมต่อไม่ได้ -> หยุดโปรแกรม)
 	db := config.InitDB(cfg)
 
 	// สร้าง Repository, Service และ Handler
@@ -31,7 +31,7 @@ func main() {
 	// ตั้งค่า Fiber App
 	app := fiber.New()
 
-	// กำหนด Routes จากไฟล์ routes.go
+	// ตั้งค่า Routes
 	routes.SetupRoutes(app, carbonHandler)
 
 	// รันเซิร์ฟเวอร์ที่ Port ตาม Config

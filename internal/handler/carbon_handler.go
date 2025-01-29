@@ -13,6 +13,7 @@ func NewCarbonHandler(s service.CarbonService) *CarbonHandler {
 	return &CarbonHandler{service: s}
 }
 
+// คำนวณ Carbon Footprint แบบพื้นฐาน
 func (h *CarbonHandler) CalculateEmission(c *fiber.Ctx) error {
 	type Request struct {
 		ActivityType string  `json:"activity_type"`
@@ -26,7 +27,7 @@ func (h *CarbonHandler) CalculateEmission(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
 	}
 
-	emission, err := h.service.CalculateEmission(req.ActivityType, req.DistanceKm, req.VehicleType, req.FuelType)
+	emission, err := h.service.CalculateEmissionBasic(req.ActivityType, req.DistanceKm, req.VehicleType, req.FuelType)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Calculation failed"})
 	}
@@ -34,5 +35,32 @@ func (h *CarbonHandler) CalculateEmission(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"activity_type":      req.ActivityType,
 		"carbon_emission_kg": emission,
+	})
+}
+
+// คำนวณ Carbon Footprint แบบใช้ `weight`
+func (h *CarbonHandler) CalculateEmissionWithWeight(c *fiber.Ctx) error {
+	type Request struct {
+		ActivityType string  `json:"activity_type"`
+		DistanceKm   float64 `json:"distance_km"`
+		VehicleType  string  `json:"vehicle_type"`
+		FuelType     string  `json:"fuel_type"`
+		Weight       float64 `json:"weight"`
+	}
+
+	var req Request
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid input"})
+	}
+
+	emission, err := h.service.CalculateEmissionWithWeight(req.ActivityType, req.DistanceKm, req.VehicleType, req.FuelType, req.Weight)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"activity_type":      req.ActivityType,
+		"carbon_emission_kg": emission,
+		"weight_tons":        req.Weight / 1000.0, // แสดงผลเป็นตัน
 	})
 }
