@@ -4,3 +4,4 @@ vendor/
 *.log
 *.out
 .DS_Store
+setup_project_files.bat
