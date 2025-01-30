@@ -19,7 +19,7 @@ func AssignRequestID(c *fiber.Ctx) error {
 		requestID = uuid.New().String()
 		c.Set("X-Request-ID", requestID)
 	}
-	c.Locals("request_id", requestID) // ✅ เก็บไว้ใน Fiber Context
+	c.Locals("request_id", requestID) // เก็บไว้ใน Fiber Context
 	return c.Next()
 }
 

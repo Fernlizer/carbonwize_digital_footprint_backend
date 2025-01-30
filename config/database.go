@@ -22,23 +22,23 @@ func InitDB(cfg *Config) *gorm.DB {
 	// เชื่อมต่อฐานข้อมูล
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("❌ Failed to connect to database:", err)
+		log.Fatal("failed to connect to database:", err)
 	}
 
 	// ตรวจสอบว่าฐานข้อมูลมีอยู่หรือไม่
 	sqlDB, _ := db.DB()
 	err = sqlDB.Ping()
 	if err != nil {
-		log.Fatal("❌ Database is not available. Please check your database connection.")
+		log.Fatal("database is not available. Please check your database connection.")
 	}
 
 	// ตรวจสอบว่าตาราง `emission_factors` มีอยู่หรือไม่
 	if !db.Migrator().HasTable(&domain.EmissionFactor{}) {
-		log.Fatal("❌ Table 'emission_factors' does not exist. Please run database migration.")
+		log.Fatal("table 'emission_factors' does not exist. Please run database migration.")
 	}
 
 	// ตั้งค่าให้ใช้งานฐานข้อมูลนี้
 	DB = db
-	fmt.Println("✅ Database connected successfully!")
+	fmt.Println("database connected successfully!")
 	return DB
 }

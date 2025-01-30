@@ -37,6 +37,6 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	fmt.Println("✅ Config loaded successfully!")
+	fmt.Println("Config loaded successfully!")
 	return &config, nil
 }
