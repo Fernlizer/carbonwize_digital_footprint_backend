@@ -160,3 +160,6 @@ curl -X GET http://localhost:8080/ready
 
 📌 เปิด **Swagger UI** ที่ 👉 [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
+---
+fernserv@gmail.com
+099-252-76O1
