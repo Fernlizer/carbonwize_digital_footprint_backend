@@ -16,7 +16,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 
-	// Import docs เพื่อให้ Swagger UI ทำงาน
 	_ "github.com/Fernlizer/carbonwize_digital_footprint_backend/docs"
 )
 
